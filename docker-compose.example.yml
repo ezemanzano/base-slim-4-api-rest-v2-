@@ -1,0 +1,70 @@
+version: '3.1'
+
+# Docker Services
+
+services:
+
+  # PHP/Apache Service
+  
+  apirest:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    container_name: liouapi-api-rest
+    restart: "always"
+    ports:
+      - "85:80"
+    volumes:
+      - ./app/:/var/www/app
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - liouapi-network
+
+  
+  # MySQL Service
+  
+  mariadb:
+    image: mariadb
+    container_name: liouapi-mariadb
+    restart: "always"
+    environment:
+      MYSQL_ROOT_PASSWORD: "DVsO]E/2CAW08V7q"
+      MYSQL_DATABASE: "liouapi"
+    ports: 
+      - "33:3306"
+    volumes:
+      - liouapi-dbdata:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - liouapi-network
+
+  
+  # PHPMyAdmin Service
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: liouapi-phpmyadmin
+    restart: "always"
+    ports:
+      - "86:80"
+    volumes:
+        - /sessions
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: "DVsO]E/2CAW08V7q"
+    depends_on:
+      - mariadb
+    networks:
+      - liouapi-network
+
+# Docker Networks
+
+networks:
+  liouapi-network:
+    driver: bridge
+
+# Volumes
+
+volumes:
+  liouapi-dbdata:
+    driver: local

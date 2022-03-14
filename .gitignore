@@ -1,0 +1,5 @@
+app/storage/*
+app/vendor/*
+app/logs/*
+app/.env
+docker-compose.yml
